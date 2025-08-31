@@ -1,0 +1,34 @@
+syntax = "proto3";
+package mastrmnd;
+
+service Echo {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc GetState(GetStateRequest) returns (GetStateResponse);
+}
+
+message RegisterRequest {
+  string message = 1;
+}
+
+message RegisterResponse {
+  string message = 1;
+}
+
+message GetStateRequest {}
+
+message GetStateResponse {
+  repeated ClientState states = 1;
+}
+
+message ClientState {
+  string name = 1;
+  uint64 call_count = 2;
+  uint64 last_seen_secs = 3;
+  string last_message = 4;
+  MndState state = 5;
+}
+
+enum MndState {
+  IDLE = 0;
+  PLAYING = 1;
+}

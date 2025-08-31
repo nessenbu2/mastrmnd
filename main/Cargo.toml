@@ -1,0 +1,25 @@
+[package]
+name = "mastrmnd"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "mastrmnd"
+path = "src/server/main.rs"
+
+[[bin]]
+name = "client"
+path = "src/client/main.rs"
+
+[dependencies]
+tonic = { version = "0.12", package = "tonic" }
+prost = "0.13"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+hyper = { version = "0.14", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+axum = { version = "0.7" }
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+
+[build-dependencies]
+tonic-build = "0.12"

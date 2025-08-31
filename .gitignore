@@ -1,0 +1,6 @@
+main/target
+
+/client/node_modules
+/client/dist
+
+.idea/
