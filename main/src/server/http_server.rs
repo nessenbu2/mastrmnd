@@ -1,12 +1,12 @@
 use std::net::SocketAddr;
-use axum::{routing::get, Router, response::IntoResponse, extract::State, http::{StatusCode, HeaderValue, Method}};
+use axum::{routing::get, Router, response::IntoResponse, extract::{Path, State},
+           http::{StatusCode, HeaderValue, Method}};
 use axum::response::Response;
 use axum::body::Body;
 use tower_http::cors::{Any, CorsLayer};
 
 #[derive(Clone)]
 struct AppState {
-    tracker: super::tracker::Tracker,
     store: super::client_state::ClientStateStore,
 }
 
@@ -24,7 +24,7 @@ async fn root() -> impl IntoResponse {
 }
 
 async fn get_clients(State(state): State<AppState>) -> impl IntoResponse {
-    let snapshot = state.tracker.snapshot();
+    let snapshot = state.store.snapshot();
     let body = match serde_json::to_string(&snapshot) { Ok(s) => s, Err(_) => "{}".to_string() };
     Response::builder()
         .status(StatusCode::OK)
@@ -43,13 +43,17 @@ async fn get_clients_state(State(state): State<AppState>) -> impl IntoResponse {
         .unwrap()
 }
 
-pub async fn start_http(addr: SocketAddr, tracker: super::tracker::Tracker, store: super::client_state::ClientStateStore) -> Result<(), Box<dyn std::error::Error>> {
-    let state = AppState { tracker, store };
+async fn inc_client(State(state): State<AppState>, Path((id)) : Path<(String)>) {
+}
+
+pub async fn start_http(addr: SocketAddr, store: super::client_state::ClientStateStore) -> Result<(), Box<dyn std::error::Error>> {
+    let state = AppState { store };
 
     let app = Router::new()
         .route("/", get(root))
         .route("/clients", get(get_clients))
         .route("/clients/state", get(get_clients_state))
+        .route("/clients/inc/{client_id}", get(inc_client))
         .with_state(state)
         .layer(cors_layer());
 
