@@ -50,7 +50,7 @@ impl Echo for EchoService {
     }
 }
 
-pub fn extract_client_name<T>(req: &tonic::Request<T>) -> String {
+pub fn extract_client_name<T>(req: &Request<T>) -> String {
     // Print all metadata key/value pairs for visibility
     // Note: avoid panics; bound output sizes
     let md = req.metadata();
@@ -94,10 +94,10 @@ pub fn extract_client_name<T>(req: &tonic::Request<T>) -> String {
 
     // Prefer explicit metadata header x-client-name, then x-client-id
     if let Some(val) = req.metadata().get("x-client-name") {
-        if let Ok(s) = val.to_str() { return format!("name:{}", s); }
+        if let Ok(s) = val.to_str() { return format!("{}", s); }
     }
     if let Some(val) = req.metadata().get("x-client-id") {
-        if let Ok(s) = val.to_str() { return format!("name:{}", s); }
+        if let Ok(s) = val.to_str() { return format!("{}", s); }
     }
     // Try to get peer addr from extensions (set by Tonic/Hyper)
     if let Some(peer) = req.extensions().get::<SocketAddr>() {

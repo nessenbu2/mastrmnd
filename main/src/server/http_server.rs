@@ -33,17 +33,16 @@ async fn get_clients(State(state): State<AppState>) -> impl IntoResponse {
         .unwrap()
 }
 
-async fn get_clients_state(State(state): State<AppState>) -> impl IntoResponse {
-    let detail = state.store.snapshot();
-    let body = match serde_json::to_string(&detail) { Ok(s) => s, Err(_) => "[]".to_string() };
-    Response::builder()
-        .status(StatusCode::OK)
-        .header(axum::http::header::CONTENT_TYPE, HeaderValue::from_static("application/json"))
-        .body(Body::from(body))
-        .unwrap()
+async fn toggle_state(Path(name) : Path<String>, State(state): State<AppState>)  -> impl IntoResponse {
+    println!("Toggling client state: {}", name);
+    state.store.toggle_state(name);
+    StatusCode::OK
 }
 
-async fn inc_client(State(state): State<AppState>, Path((id)) : Path<(String)>) {
+async fn inc_count(Path(name) : Path<String>, State(state): State<AppState> )  -> impl IntoResponse {
+    println!("Incrementing client named: {}", name);
+    state.store.inc(name);
+    StatusCode::OK
 }
 
 pub async fn start_http(addr: SocketAddr, store: super::client_state::ClientStateStore) -> Result<(), Box<dyn std::error::Error>> {
@@ -52,8 +51,8 @@ pub async fn start_http(addr: SocketAddr, store: super::client_state::ClientStat
     let app = Router::new()
         .route("/", get(root))
         .route("/clients", get(get_clients))
-        .route("/clients/state", get(get_clients_state))
-        .route("/clients/inc/{client_id}", get(inc_client))
+        .route("/clients/toggle/{name}", get(toggle_state))
+        .route("/clients/inc/{name}", get(inc_count))
         .with_state(state)
         .layer(cors_layer());
 

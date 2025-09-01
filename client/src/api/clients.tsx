@@ -19,6 +19,42 @@ export async function fetchClients(error: HandleError, success: HandleSuccess) {
             success(body)
         }
     } catch (e) {
-        error(e.message || String(e))
+        error(String(e))
+    }
+}
+
+export async function toggleState(clientName: String) {
+    try {
+        const resp = await fetch(`http://localhost:8080/clients/toggle/${clientName}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json, text/plain, */*'
+            }
+        })
+        let body = await resp.json();
+        if (!resp.ok){
+            console.error(body);
+        }
+    }
+    catch (e) {
+        console.error(e);
+    }
+}
+
+export async function incClient(clientName: String) {
+    try {
+        const resp = await fetch(`http://localhost:8080/clients/inc/${clientName}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json, text/plain, */*'
+            }
+        })
+        let body = await resp.json();
+        if (!resp.ok){
+            console.error(body);
+        }
+    }
+    catch (e) {
+        console.error(e);
     }
 }

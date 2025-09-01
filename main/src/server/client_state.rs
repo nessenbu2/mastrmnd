@@ -59,4 +59,18 @@ impl ClientStateStore {
     pub fn snapshot(&self) -> Vec<ClientState> {
         self.inner.lock().unwrap().values().cloned().collect()
     }
+
+    pub fn inc(&self, name: String) {
+        self.inner.lock().unwrap().entry(name).and_modify(|entry| {entry.call_count += 1});
+    }
+
+    pub fn toggle_state(&self, name: String) {
+        self.inner.lock().unwrap().entry(name).and_modify(|entry| {
+            if entry.state == State::Idle {
+                entry.state = State::Playing
+            } else {
+                entry.state = State::Idle
+            }
+        });
+    }
 }

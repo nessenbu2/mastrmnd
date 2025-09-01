@@ -15,10 +15,9 @@ path = "src/client/main.rs"
 tonic = { version = "0.12", package = "tonic" }
 prost = "0.13"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-hyper = { version = "0.14", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-axum = { version = "0.7" }
+axum = { version = "0.8.4" }
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 
 [build-dependencies]
