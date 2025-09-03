@@ -76,3 +76,22 @@ export async function getClientState(clientName: String, error: HandleError, suc
         error(String(e))
     }
 }
+
+export async function getLibrary(error: HandleError, success: HandleSuccess) {
+    try {
+        const resp = await fetch('http://localhost:8080/library', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json, text/plain, */*'
+            }
+        })
+        let body = await resp.json()
+        if (!resp.ok){
+            error(body)
+        } else {
+            success(body)
+        }
+    } catch (e) {
+        error(String(e))
+    }
+}

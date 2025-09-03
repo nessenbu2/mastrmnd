@@ -8,6 +8,7 @@ use tower_http::cors::{Any, CorsLayer};
 #[derive(Clone)]
 struct AppState {
     store: super::client_state::ClientStateStore,
+    library: super::library::Library,
 }
 
 // Helper to build CORS layer similar to previous headers
@@ -56,8 +57,19 @@ async fn get_client_state(Path(name) : Path<String>, State(state): State<AppStat
         .unwrap()
 }
 
-pub async fn start_http(addr: SocketAddr, store: super::client_state::ClientStateStore) -> Result<(), Box<dyn std::error::Error>> {
-    let state = AppState { store };
+async fn get_library(State(state): State<AppState>) -> impl IntoResponse {
+    println!("Getting library");
+    let state = serde_json::to_string(&state.library.get_state())
+        .unwrap_or_else(|_| "{}".to_string());
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(axum::http::header::CONTENT_TYPE, HeaderValue::from_static("application/json"))
+        .body(Body::from(state))
+        .unwrap()
+}
+
+pub async fn start_http(addr: SocketAddr, store: super::client_state::ClientStateStore, library: super::library::Library) -> Result<(), Box<dyn std::error::Error>> {
+    let state = AppState { store, library };
 
     let app = Router::new()
         .route("/", get(root))
@@ -65,6 +77,7 @@ pub async fn start_http(addr: SocketAddr, store: super::client_state::ClientStat
         .route("/clients/toggle/{name}", get(toggle_state))
         .route("/clients/inc/{name}", get(inc_count))
         .route("/clients/state/{name}", get(get_client_state))
+        .route("/library", get(get_library))
         .with_state(state)
         .layer(cors_layer());
 

@@ -10,6 +10,7 @@ use mastrmnd::{echo_server::{Echo, EchoServer}, RegisterRequest, RegisterRespons
 #[derive(Clone)]
 pub struct EchoService {
     store: super::client_state::ClientStateStore,
+    library: super::library::Library,
 }
 
 #[tonic::async_trait]
@@ -107,8 +108,8 @@ pub fn extract_client_name<T>(req: &Request<T>) -> String {
     "unknown".to_string()
 }
 
-pub async fn start_server(addr: std::net::SocketAddr, store: super::client_state::ClientStateStore) -> Result<(), Box<dyn std::error::Error>> {
-    let svc = EchoService { store };
+pub async fn start_server(addr: SocketAddr, store: super::client_state::ClientStateStore, library: super::library::Library) -> Result<(), Box<dyn std::error::Error>> {
+    let svc = EchoService { store, library };
     Server::builder()
         .add_service(EchoServer::new(svc))
         .serve(addr)

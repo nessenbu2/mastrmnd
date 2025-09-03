@@ -11,6 +11,22 @@ export type ClientState = {
   state: State | number | string;
 };
 
+export type Song = {
+  name: string;
+  artist: string;
+  album: string;
+}
+
+export type Album = {
+  name: string;
+  album: Array<Song>;
+}
+
+export type Artists = {
+  name: string;
+  albums: Array<Album>;
+}
+
 export type ClientsResponse = ClientState[];
 
 export default ClientState;
