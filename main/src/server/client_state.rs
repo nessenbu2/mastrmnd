@@ -60,6 +60,10 @@ impl ClientStateStore {
         self.inner.lock().unwrap().values().cloned().collect()
     }
 
+    pub fn get_state(&self, name: String) -> Option<ClientState> {
+        self.inner.lock().unwrap().get(&name).cloned()
+    }
+
     pub fn inc(&self, name: String) {
         self.inner.lock().unwrap().entry(name).and_modify(|entry| {entry.call_count += 1});
     }

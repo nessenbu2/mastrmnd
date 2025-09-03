@@ -1,4 +1,3 @@
-
 type HandleError = (error: string) => void;
 import type { ClientsResponse } from "../lib/types";
 
@@ -56,5 +55,24 @@ export async function incClient(clientName: String) {
     }
     catch (e) {
         console.error(e);
+    }
+}
+
+export async function getClientState(clientName: String, error: HandleError, success: HandleSuccess) {
+    try {
+        const resp = await fetch(`http://localhost:8080/clients/state/${clientName}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json, text/plain, */*'
+            }
+        })
+        let body = await resp.json()
+        if (!resp.ok){
+            error(body)
+        } else {
+            success(body)
+        }
+    } catch (e) {
+        error(String(e))
     }
 }

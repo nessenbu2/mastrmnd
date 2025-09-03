@@ -45,6 +45,17 @@ async fn inc_count(Path(name) : Path<String>, State(state): State<AppState> )  -
     StatusCode::OK
 }
 
+async fn get_client_state(Path(name) : Path<String>, State(state): State<AppState>) -> impl IntoResponse {
+    println!("Getting state for client named: {}", name);
+    let client_state = state.store.get_state(name);
+    let body = serde_json::to_string(&client_state).unwrap_or_else(|_| "{}".to_string());
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(axum::http::header::CONTENT_TYPE, HeaderValue::from_static("application/json"))
+        .body(Body::from(body))
+        .unwrap()
+}
+
 pub async fn start_http(addr: SocketAddr, store: super::client_state::ClientStateStore) -> Result<(), Box<dyn std::error::Error>> {
     let state = AppState { store };
 
@@ -53,6 +64,7 @@ pub async fn start_http(addr: SocketAddr, store: super::client_state::ClientStat
         .route("/clients", get(get_clients))
         .route("/clients/toggle/{name}", get(toggle_state))
         .route("/clients/inc/{name}", get(inc_count))
+        .route("/clients/state/{name}", get(get_client_state))
         .with_state(state)
         .layer(cors_layer());
 
