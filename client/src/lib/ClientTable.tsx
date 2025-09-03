@@ -1,6 +1,6 @@
 
-import type { ClientState } from "./lib/types";
-import ClientRow from "./lib/ClientRow";
+import type { ClientState } from "./types";
+import ClientRow from "./ClientRow";
 
 type Props = { clients: ClientState[] };
 
@@ -11,6 +11,7 @@ export default function ClientTable({ clients }: Props) {
           <thead>
           <tr>
             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '4px 8px' }}>Client</th>
+            <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '4px 8px' }}>Edit</th>
             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '4px 8px' }}>Toggle</th>
             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '4px 8px' }}>Inc</th>
             <th style={{ textAlign: 'right', borderBottom: '1px solid #ccc', padding: '4px 8px' }}>Calls</th>
