@@ -19,10 +19,10 @@ export type Song = {
 
 export type Album = {
   name: string;
-  album: Array<Song>;
+  songs: Array<Song>;
 }
 
-export type Artists = {
+export type Artist = {
   name: string;
   albums: Array<Album>;
 }

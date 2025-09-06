@@ -1,13 +1,14 @@
 import {useParams} from "react-router-dom";
 import {getClientState, getLibrary} from "../api/clients";
 import {useEffect, useState} from "react";
-import ClientState, {Artists} from "./types";
+import ClientState, {Artist, Song} from "./types";
+import Library from "./Library";
 
 
 export default function ClientPage() {
     const { clientName } = useParams()
     const [client, setClient] = useState<ClientState | null>(null)
-    const [library, setLibrary] = useState<Array<Artists>>([])
+    const [library, setLibrary] = useState<Array<Artist>>([])
     const [error, setError] = useState<string | null>(null)
     const [libraryError, setLibraryError] = useState<string | null>(null)
 
@@ -23,6 +24,11 @@ export default function ClientPage() {
         return () => clearInterval(id)
     }, [])
 
+    const onPlay = (song: Song) => {
+        console.log("would play song: " + song.name);
+        console.log("client name: " + clientName);
+    }
+
     return (
         <div>
             {error && (
@@ -36,7 +42,7 @@ export default function ClientPage() {
             )}
             <div>
                 {!libraryError && (
-                    <p>Number of artists: {library.length}</p>
+                    <Library artists={library} handlePlay={onPlay}/>
                 )}
             </div>
         </div>
