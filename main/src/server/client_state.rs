@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use serde::Serialize;
 use std::time::{SystemTime, UNIX_EPOCH};
+use crate::library::Song;
 
 #[derive(Clone, Copy, Debug, Serialize, PartialEq, Eq)]
 pub enum State {
@@ -25,6 +26,7 @@ pub struct ClientState {
     pub last_seen_secs: u64,
     pub last_message: String,
     pub state: State,
+    pub song: Option<Song>,
 }
 
 #[derive(Clone, Default)]
@@ -44,11 +46,18 @@ impl ClientStateStore {
             last_seen_secs: now,
             last_message: String::new(),
             state: State::Idle,
+            song: None,
         });
         entry.call_count += 1;
         entry.last_seen_secs = now;
         entry.last_message = message;
         if let Some(s) = state { entry.state = State::from(s); }
+    }
+
+    pub fn play_song(&self, name: String, song: Song) {
+        self.inner.lock().unwrap().entry(name).and_modify(|entry| {
+            entry.song = Some(song);
+        });
     }
 
     pub fn snapshot_counts(&self) -> HashMap<String, u64> {

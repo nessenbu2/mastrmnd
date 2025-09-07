@@ -1,5 +1,5 @@
 type HandleError = (error: string) => void;
-import type { ClientsResponse } from "../lib/types";
+import type {ClientsResponse, Song} from "../lib/types";
 
 type HandleSuccess = (result: ClientsResponse) => void;
 
@@ -93,5 +93,24 @@ export async function getLibrary(error: HandleError, success: HandleSuccess) {
         }
     } catch (e) {
         error(String(e))
+    }
+}
+
+export async function playSong(clientName: String, song: Song) {
+    try {
+        const resp = await fetch(`http://localhost:8080/clients/play/${clientName}`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(song)
+        })
+        let body = await resp.json()
+        if (!resp.ok){
+            console.error(body)
+        }
+    } catch (e) {
+        console.error(e)
     }
 }

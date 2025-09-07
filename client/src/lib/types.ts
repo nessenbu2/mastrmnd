@@ -9,6 +9,7 @@ export type ClientState = {
   last_seen_secs: number;
   last_message: string;
   state: State | number | string;
+  song?: Song;
 };
 
 export type Song = {

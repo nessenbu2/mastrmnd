@@ -7,9 +7,9 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Song {
-    artist: String,
-    album: String,
-    name: String,
+    pub artist: String,
+    pub album: String,
+    pub name: String,
 }
 
 impl Song {

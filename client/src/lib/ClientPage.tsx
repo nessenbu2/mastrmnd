@@ -1,5 +1,5 @@
 import {useParams} from "react-router-dom";
-import {getClientState, getLibrary} from "../api/clients";
+import {getClientState, getLibrary, playSong} from "../api/clients";
 import {useEffect, useState} from "react";
 import ClientState, {Artist, Song} from "./types";
 import Library from "./Library";
@@ -25,8 +25,8 @@ export default function ClientPage() {
     }, [])
 
     const onPlay = (song: Song) => {
-        console.log("would play song: " + song.name);
-        console.log("client name: " + clientName);
+        playSong(clientName!, song)
+            .then(() => getClientState(clientName!, setError, setClient))
     }
 
     return (
@@ -38,6 +38,9 @@ export default function ClientPage() {
                 <div>
                     <h2>Client: {client.name}</h2>
                     <p>State: {client.state}</p>
+                    {client.song && (
+                        <p>Playing: {client.song.name} by {client.song.artist} off {client.song.album}</p>
+                    )}
                 </div>
             )}
             <div>

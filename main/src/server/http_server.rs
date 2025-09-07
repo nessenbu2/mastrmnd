@@ -1,9 +1,9 @@
 use std::net::SocketAddr;
-use axum::{routing::get, Router, response::IntoResponse, extract::{Path, State},
-           http::{StatusCode, HeaderValue, Method}};
+use axum::{routing::get, routing::put, Router, response::IntoResponse, extract::{Path, State}, http::{StatusCode, HeaderValue, Method}, Json};
 use axum::response::Response;
 use axum::body::Body;
 use tower_http::cors::{Any, CorsLayer};
+use crate::library::Song;
 
 #[derive(Clone)]
 struct AppState {
@@ -68,6 +68,12 @@ async fn get_library(State(state): State<AppState>) -> impl IntoResponse {
         .unwrap()
 }
 
+async fn play_song(Path(name) : Path<String>, State(state): State<AppState>, Json(song): Json<Song>) -> impl IntoResponse {
+    println!("Playing song for client named: {}, song: {}", name, song.name);
+    state.store.play_song(name, song);
+    StatusCode::OK
+}
+
 pub async fn start_http(addr: SocketAddr, store: super::client_state::ClientStateStore, library: super::library::Library) -> Result<(), Box<dyn std::error::Error>> {
     let state = AppState { store, library };
 
@@ -77,6 +83,7 @@ pub async fn start_http(addr: SocketAddr, store: super::client_state::ClientStat
         .route("/clients/toggle/{name}", get(toggle_state))
         .route("/clients/inc/{name}", get(inc_count))
         .route("/clients/state/{name}", get(get_client_state))
+        .route("/clients/play/{name}", put(play_song))
         .route("/library", get(get_library))
         .with_state(state)
         .layer(cors_layer());
