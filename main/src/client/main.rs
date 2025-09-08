@@ -21,11 +21,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut client = EchoClient::new(channel);
 
-    // Determine client name: prefer CLIENT_NAME, then CLIENT_ID; else generate random
+    // Priority for name is
+    // 1. env var CLIENT_NAME
+    // 2. env var CLIENT_ID
+    // 3. first argument to the command line
+    // 4. a random string
     let client_name = std::env::var("CLIENT_NAME")
         .ok()
         .filter(|s| !s.is_empty())
         .or_else(|| std::env::var("CLIENT_ID").ok().filter(|s| !s.is_empty()))
+        .or_else(|| {
+            let args: Vec<String> = std::env::args().collect();
+            if args.len() > 1 {
+                // First argument is the name of the binary, don't use that
+                Some(args[1].clone())
+            } else {
+                None
+            }
+        })
         .unwrap_or_else(|| {
             // Simple random fallback without extra deps
             use std::time::{SystemTime, UNIX_EPOCH};
@@ -35,15 +48,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
     println!("Using client_name={}", client_name);
 
-    let msg = std::env::args().nth(1).unwrap_or_else(|| "hello from client".to_string());
-    let mut request = Request::new(RegisterRequest { message: msg });
-    // Attach x-client-name metadata (and x-client-id for backward compatibility)
-    if let Ok(val) = MetadataValue::try_from(client_name.as_str()) {
-        request.metadata_mut().insert("x-client-name", val.clone());
-        request.metadata_mut().insert("x-client-id", val);
-    } else {
-        eprintln!("Warning: CLIENT_NAME/CLIENT_ID contains invalid characters for gRPC metadata; skipping headers");
-    }
+    let request = Request::new(RegisterRequest { client_name: client_name, port: 1234 });
 
     match client.register(request).await {
         Ok(response) => {

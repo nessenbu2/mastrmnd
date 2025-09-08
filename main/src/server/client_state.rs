@@ -24,7 +24,7 @@ pub struct ClientState {
     pub name: String,
     pub call_count: u64,
     pub last_seen_secs: u64,
-    pub last_message: String,
+    pub port: u32,
     pub state: State,
     pub song: Option<Song>,
 }
@@ -37,21 +37,19 @@ pub struct ClientStateStore {
 impl ClientStateStore {
     pub fn new() -> Self { Self::default() }
 
-    pub fn record_register(&self, name: String, message: String, state: Option<i32>) {
+    pub fn record_register(&self, name: String, port: u32) {
         let now = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
         let mut map = self.inner.lock().unwrap();
         let entry = map.entry(name.clone()).or_insert_with(|| ClientState {
             name: name.clone(),
             call_count: 0,
             last_seen_secs: now,
-            last_message: String::new(),
+            port,
             state: State::Idle,
             song: None,
         });
         entry.call_count += 1;
         entry.last_seen_secs = now;
-        entry.last_message = message;
-        if let Some(s) = state { entry.state = State::from(s); }
     }
 
     pub fn play_song(&self, name: String, song: Song) {

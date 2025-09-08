@@ -32,7 +32,7 @@ export default function ClientRow({ state } : Props) {
                 <button onClick={() => handleInc()} type={"reset"}>Inc Count</button>
             </td>
             <td style={{ borderBottom: '1px solid #eee', padding: '4px 8px', textAlign: 'right' }}>{state.call_count}</td>
-            <td style={{ borderBottom: '1px solid #eee', padding: '4px 8px' }}>{state.last_message}</td>
+            <td style={{ borderBottom: '1px solid #eee', padding: '4px 8px' }}>{state.port}</td>
             <td style={{ borderBottom: '1px solid #eee', padding: '4px 8px', textAlign: 'right' }}>{state.last_seen_secs}</td>
             <td style={{ borderBottom: '1px solid #eee', padding: '4px 8px' }}>{state.state}</td>
         </tr>

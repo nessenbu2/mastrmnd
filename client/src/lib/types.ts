@@ -7,7 +7,7 @@ export type ClientState = {
   name: string;
   call_count: number;
   last_seen_secs: number;
-  last_message: string;
+  port: number;
   state: State | number | string;
   song?: Song;
 };
